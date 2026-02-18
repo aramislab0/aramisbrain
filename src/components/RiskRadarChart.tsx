@@ -69,7 +69,7 @@ export function RiskRadarChart({
                     color: '#FFFFFF', // text-primary
                     font: {
                         size: 14,
-                        weight: '600' as const
+                        weight: 'bold' as const
                     }
                 }
             }
@@ -117,9 +117,9 @@ export function RiskRadarChart({
                     <div key={item.label} className="bg-bg-primary rounded p-3">
                         <p className="text-xs text-text-secondary mb-1">{item.label}</p>
                         <p className={`text-2xl font-bold ${item.value > 7 ? 'text-risk-critical' :
-                                item.value > 5 ? 'text-risk-high' :
-                                    item.value > 3 ? 'text-risk-medium' :
-                                        'text-risk-low'
+                            item.value > 5 ? 'text-risk-high' :
+                                item.value > 3 ? 'text-risk-medium' :
+                                    'text-risk-low'
                             }`}>
                             {item.value.toFixed(1)}
                         </p>

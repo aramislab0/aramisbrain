@@ -1,5 +1,5 @@
 import { getSupabaseClient } from '@/lib/supabase';
-import { openai, anthropic } from '@/lib/ai';
+import { getOpenAI, getAnthropic } from '@/lib/ai';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -46,7 +46,7 @@ Recommandation attendue : directe, chiffrée, actionnable.`;
 
     try {
         if (model === 'gpt4') {
-            const completion = await openai.chat.completions.create({
+            const completion = await getOpenAI().chat.completions.create({
                 model: 'gpt-4-turbo-preview',
                 messages: [
                     { role: 'system', content: systemPrompt },
@@ -62,7 +62,7 @@ Recommandation attendue : directe, chiffrée, actionnable.`;
             });
 
         } else {
-            const completion = await anthropic.messages.create({
+            const completion = await getAnthropic().messages.create({
                 model: 'claude-sonnet-4-20250514',
                 max_tokens: 1000,
                 system: systemPrompt,

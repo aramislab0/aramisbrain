@@ -1,5 +1,5 @@
 import { getSupabaseClient } from '@/lib/supabase';
-import { anthropic } from '@/lib/ai';
+import { getAnthropic } from '@/lib/ai';
 import { NextResponse } from 'next/server';
 
 // GET /api/summaries/weekly?start_date=YYYY-MM-DD
@@ -57,7 +57,7 @@ ${projectsData && projectsData.length > 0
 `;
 
         // Generate weekly summary
-        const message = await anthropic.messages.create({
+        const message = await getAnthropic().messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 1536,
             messages: [{

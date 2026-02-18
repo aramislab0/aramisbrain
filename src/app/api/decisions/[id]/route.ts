@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function GET(request: NextRequest, context: any) {
     const { id } = await Promise.resolve(context.params);
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
         .from('decisions')
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, context: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function PUT(request: NextRequest, context: any) {
     const { id } = await Promise.resolve(context.params);
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     const body = await request.json();
 
     const { data, error } = await supabase
@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest, context: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function DELETE(request: NextRequest, context: any) {
     const { id } = await Promise.resolve(context.params);
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
 
     const { error } = await supabase
         .from('decisions')

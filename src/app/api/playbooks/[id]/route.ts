@@ -1,11 +1,15 @@
 import { createClient } from '@/lib/supabase';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-    request: Request,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+type RouteContext = { params: { id: string } | Promise<{ id: string }> };
+
+async function resolveId(params: RouteContext['params']): Promise<string> {
+    const resolved = await Promise.resolve(params);
+    return resolved.id;
+}
+
+export async function GET(request: NextRequest, context: RouteContext) {
+    const id = await resolveId(context.params);
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -21,11 +25,8 @@ export async function GET(
     return NextResponse.json({ playbook: data });
 }
 
-export async function PUT(
-    request: Request,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function PUT(request: NextRequest, context: RouteContext) {
+    const id = await resolveId(context.params);
     const supabase = createClient();
     const body = await request.json();
 
@@ -48,11 +49,8 @@ export async function PUT(
     return NextResponse.json({ playbook: data });
 }
 
-export async function DELETE(
-    request: Request,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    const { id } = await params;
+export async function DELETE(request: NextRequest, context: RouteContext) {
+    const id = await resolveId(context.params);
     const supabase = createClient();
 
     const { error } = await supabase

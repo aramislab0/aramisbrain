@@ -1,15 +1,9 @@
 import { createClient } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 
-type RouteContext = { params: { id: string } | Promise<{ id: string }> };
-
-async function resolveId(params: RouteContext['params']): Promise<string> {
-    const resolved = await Promise.resolve(params);
-    return resolved.id;
-}
-
-export async function GET(request: NextRequest, context: RouteContext) {
-    const id = await resolveId(context.params);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function GET(request: NextRequest, context: any) {
+    const { id } = await Promise.resolve(context.params);
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -25,8 +19,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ decision: data });
 }
 
-export async function PUT(request: NextRequest, context: RouteContext) {
-    const id = await resolveId(context.params);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function PUT(request: NextRequest, context: any) {
+    const { id } = await Promise.resolve(context.params);
     const supabase = createClient();
     const body = await request.json();
 
@@ -51,8 +46,9 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ decision: data });
 }
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
-    const id = await resolveId(context.params);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function DELETE(request: NextRequest, context: any) {
+    const { id } = await Promise.resolve(context.params);
     const supabase = createClient();
 
     const { error } = await supabase

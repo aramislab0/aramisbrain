@@ -1,38 +1,45 @@
-import { getSupabaseClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
-// GET /api/decisions/[id] - Get single decision
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const supabase = getSupabaseClient();
+    const { id } = await params;
+    const supabase = createClient();
 
-    const { data: decision, error } = await supabase
+    const { data, error } = await supabase
         .from('decisions')
         .select('*, projects(name, slug)')
-        .eq('id', params.id)
+        .eq('id', id)
         .single();
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ decision });
+    return NextResponse.json({ decision: data });
 }
 
-// PUT /api/decisions/[id] - Update decision
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const supabase = getSupabaseClient();
+    const { id } = await params;
+    const supabase = createClient();
     const body = await request.json();
 
-    const { data: decision, error } = await supabase
+    const { data, error } = await supabase
         .from('decisions')
-        .update(body)
-        .eq('id', params.id)
+        .update({
+            title: body.title,
+            context: body.context,
+            decision: body.decision,
+            rationale: body.rationale,
+            alternatives_considered: body.alternatives_considered,
+            status: body.status,
+        })
+        .eq('id', id)
         .select()
         .single();
 
@@ -40,29 +47,20 @@ export async function PUT(
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Log event
-    await supabase.from('events').insert({
-        event_type: 'decision.updated',
-        entity_type: 'decision',
-        entity_id: decision.id,
-        description: `Décision modifiée: ${decision.title}`,
-        metadata: { decision_id: decision.id }
-    });
-
-    return NextResponse.json({ decision });
+    return NextResponse.json({ decision: data });
 }
 
-// DELETE /api/decisions/[id] - Delete decision
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const supabase = getSupabaseClient();
+    const { id } = await params;
+    const supabase = createClient();
 
     const { error } = await supabase
         .from('decisions')
         .delete()
-        .eq('id', params.id);
+        .eq('id', id);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

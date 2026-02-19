@@ -47,7 +47,7 @@ Recommandation attendue : directe, chiffrée, actionnable.`;
     try {
         if (model === 'gpt4') {
             const completion = await getOpenAI().chat.completions.create({
-                model: 'gpt-4-turbo-preview',
+                model: 'gpt-4o',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: message }

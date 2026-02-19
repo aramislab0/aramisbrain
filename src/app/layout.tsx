@@ -13,6 +13,7 @@ import {
   Calendar,
   Library,
   BrainCircuit,
+  Sparkles,
   Zap,
 } from 'lucide-react';
 
@@ -34,6 +35,7 @@ const navLinks = [
   { href: '/events', label: 'Événements', icon: Calendar },
   { href: '/playbooks', label: 'Playbooks', icon: Library },
   { href: '/ai-chat', label: 'IA', icon: BrainCircuit },
+  { href: '/oracle', label: 'Oracle', icon: Sparkles },
 ];
 
 export default function RootLayout({

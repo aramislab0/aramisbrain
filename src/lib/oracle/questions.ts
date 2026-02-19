@@ -9,6 +9,16 @@ interface StrategicQuestion {
     questionType: 'reflection' | 'decision' | 'priority' | 'strategy';
 }
 
+/**
+ * Generates 1-3 strategic questions for CEO reflection.
+ * Questions are non-directive and context-aware, drawn from:
+ * - Pending decisions (oldest first)
+ * - Stagnant projects (14+ days inactive)
+ * - Portfolio concentration opportunities
+ * - Quick win identification
+ *
+ * @returns Array of 1-3 strategic questions with context and rationale
+ */
 export async function generateStrategicQuestions(): Promise<StrategicQuestion[]> {
     const questions: StrategicQuestion[] = [];
     const supabase = getSupabaseClient();

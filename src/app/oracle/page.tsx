@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Calendar, Sparkles, MessageCircle, TrendingUp } from 'lucide-react';
+import { Calendar, Sparkles, MessageCircle, TrendingUp, RefreshCw } from 'lucide-react';
+import './animations.css';
 
 interface Trajectory {
     trajectory_number: number;
@@ -45,6 +46,7 @@ export default function OraclePage() {
     const [selectedTrajectory, setSelectedTrajectory] = useState<number>(1);
     const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         loadOracleData();
@@ -52,6 +54,7 @@ export default function OraclePage() {
 
     async function loadOracleData() {
         setLoading(true);
+        setError(null);
         try {
             const [trajRes, qRes, sumRes] = await Promise.all([
                 fetch('/api/oracle/trajectories?refresh=true'),
@@ -86,8 +89,9 @@ export default function OraclePage() {
 
             const sumData = await sumRes.json();
             setSummary(sumData.summary || null);
-        } catch (error) {
-            console.error('Error loading Oracle data:', error);
+        } catch (err) {
+            console.error('Error loading Oracle data:', err);
+            setError('Impossible de charger les insights ORACLE. Veuillez réessayer.');
         } finally {
             setLoading(false);
         }
@@ -105,12 +109,108 @@ export default function OraclePage() {
         return (summary as any)[field] || (summary as any)[camelMap[field]] || '';
     };
 
+    // ─── Loading Skeleton ───
     if (loading) {
         return (
+            <div className="min-h-screen text-white" style={{ background: 'linear-gradient(to bottom, #0F0F0F, #1A1A1A)' }}>
+                <header className="border-b border-white/[0.06] py-10" role="banner">
+                    <div className="max-w-5xl mx-auto px-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center">
+                                <Sparkles className="w-6 h-6 text-[#D4AF37] animate-pulse" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-light tracking-wide" style={{ color: '#D4AF37' }}>ORACLE</h1>
+                                <p className="text-sm text-white/40 mt-0.5">Génération insights...</p>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main className="max-w-5xl mx-auto px-6 py-12 space-y-16" role="main">
+                    {/* Summary skeleton */}
+                    <div className="rounded-2xl p-8 border border-white/[0.06]" style={{ background: 'rgba(26,26,26,0.5)' }}>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="oracle-skeleton w-5 h-5 rounded" />
+                            <div className="oracle-skeleton h-5 w-40" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="oracle-skeleton h-4 w-full" />
+                            <div className="oracle-skeleton h-4 w-3/4" />
+                            <div className="oracle-skeleton h-4 w-5/6" />
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-8 mt-8">
+                            <div className="space-y-3">
+                                <div className="oracle-skeleton h-3 w-24" />
+                                <div className="oracle-skeleton h-4 w-full" />
+                                <div className="oracle-skeleton h-4 w-3/4" />
+                            </div>
+                            <div className="space-y-3">
+                                <div className="oracle-skeleton h-3 w-28" />
+                                <div className="oracle-skeleton h-4 w-full" />
+                                <div className="oracle-skeleton h-4 w-2/3" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Trajectories skeleton */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <div className="oracle-skeleton w-5 h-5 rounded" />
+                            <div className="oracle-skeleton h-5 w-48" />
+                        </div>
+                        <div className="flex gap-3">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="oracle-skeleton h-11 w-52 rounded-xl" />
+                            ))}
+                        </div>
+                        <div className="rounded-2xl p-8 border border-white/[0.06]" style={{ background: 'rgba(26,26,26,0.5)' }}>
+                            <div className="space-y-6">
+                                <div className="oracle-skeleton h-6 w-28 rounded-full" />
+                                <div className="space-y-3">
+                                    <div className="oracle-skeleton h-3 w-16" />
+                                    <div className="oracle-skeleton h-4 w-full" />
+                                    <div className="oracle-skeleton h-4 w-4/5" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Questions skeleton */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <div className="oracle-skeleton w-5 h-5 rounded" />
+                            <div className="oracle-skeleton h-5 w-44" />
+                        </div>
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="oracle-skeleton h-20 w-full rounded-xl" />
+                        ))}
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    // ─── Error State ───
+    if (error) {
+        return (
             <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom, #0F0F0F, #1A1A1A)' }}>
-                <div className="flex flex-col items-center gap-4">
-                    <Sparkles className="w-10 h-10 text-[#D4AF37] animate-pulse" />
-                    <p className="text-[#D4AF37]/80 text-sm tracking-wider">Génération insights ORACLE...</p>
+                <div
+                    className="rounded-2xl p-8 max-w-md text-center border border-white/[0.06]"
+                    style={{ background: 'rgba(26,26,26,0.5)', backdropFilter: 'blur(12px)' }}
+                    role="alert"
+                >
+                    <Sparkles className="w-10 h-10 text-[#D4AF37]/40 mx-auto mb-4" />
+                    <h2 className="text-lg text-white/80 mb-3 font-light">Une erreur est survenue</h2>
+                    <p className="text-white/50 text-sm mb-6 leading-relaxed">{error}</p>
+                    <button
+                        onClick={loadOracleData}
+                        className="oracle-focusable inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm transition-all duration-200 hover:opacity-90"
+                        style={{ background: '#D4AF37', color: '#000' }}
+                    >
+                        <RefreshCw className="w-4 h-4" />
+                        Réessayer
+                    </button>
                 </div>
             </div>
         );
@@ -119,27 +219,37 @@ export default function OraclePage() {
     return (
         <div className="min-h-screen text-white" style={{ background: 'linear-gradient(to bottom, #0F0F0F, #1A1A1A)' }}>
             {/* Hero Header */}
-            <header className="border-b border-white/[0.06] py-10">
+            <header className="border-b border-white/[0.06] py-10" role="banner">
                 <div className="max-w-5xl mx-auto px-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center">
-                            <Sparkles className="w-6 h-6 text-[#D4AF37]" />
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center">
+                                <Sparkles className="w-6 h-6 text-[#D4AF37]" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-light tracking-wide" style={{ color: '#D4AF37' }}>ORACLE</h1>
+                                <p className="text-sm text-white/40 mt-0.5">Clarté sans pression • Accompagnement stratégique</p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-2xl font-light tracking-wide" style={{ color: '#D4AF37' }}>ORACLE</h1>
-                            <p className="text-sm text-white/40 mt-0.5">Clarté sans pression • Accompagnement stratégique</p>
-                        </div>
+                        <button
+                            onClick={loadOracleData}
+                            className="oracle-focusable p-2.5 rounded-xl border border-white/[0.06] text-white/30 hover:text-[#D4AF37] hover:border-[#D4AF37]/20 transition-all duration-200"
+                            aria-label="Rafraîchir les insights"
+                            title="Rafraîchir"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-5xl mx-auto px-6 py-12 space-y-16">
+            <main className="max-w-5xl mx-auto px-6 py-12 space-y-16" role="main">
                 {/* ───────── Weekly Summary ───────── */}
                 {summary && (
-                    <section className="rounded-2xl p-8 border border-white/[0.06]" style={{ background: 'rgba(26,26,26,0.5)', backdropFilter: 'blur(12px)' }}>
+                    <section className="oracle-fadeInUp rounded-2xl p-8 border border-white/[0.06]" style={{ background: 'rgba(26,26,26,0.5)', backdropFilter: 'blur(12px)' }} aria-labelledby="summary-heading">
                         <div className="flex items-center gap-3 mb-8">
                             <Calendar className="w-5 h-5 text-[#D4AF37]" />
-                            <h2 className="text-lg font-light text-white/90">Semaine en bref</h2>
+                            <h2 id="summary-heading" className="text-lg font-light text-white/90">Semaine en bref</h2>
                         </div>
 
                         <div className="space-y-8">
@@ -150,7 +260,7 @@ export default function OraclePage() {
                                 </p>
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                     <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/30">Ce qui avance</h3>
                                     <div className="text-white/60 text-sm leading-relaxed whitespace-pre-line">
@@ -170,19 +280,22 @@ export default function OraclePage() {
                 )}
 
                 {/* ───────── Trajectories ───────── */}
-                <section>
+                <section className="oracle-fadeInUp oracle-delay-100" aria-labelledby="trajectories-heading">
                     <div className="flex items-center gap-3 mb-8">
                         <TrendingUp className="w-5 h-5 text-[#D4AF37]" />
-                        <h2 className="text-lg font-light text-white/90">Trajectoires possibles</h2>
+                        <h2 id="trajectories-heading" className="text-lg font-light text-white/90">Trajectoires possibles</h2>
                     </div>
 
                     {/* Trajectory Tabs */}
-                    <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
+                    <div className="flex gap-3 mb-8 overflow-x-auto pb-2 oracle-scroll-hide" role="tablist" aria-label="Trajectoires stratégiques">
                         {trajectories.map((traj) => (
                             <button
                                 key={traj.trajectory_number}
+                                role="tab"
+                                aria-selected={selectedTrajectory === traj.trajectory_number}
+                                aria-controls={`trajectory-panel-${traj.trajectory_number}`}
                                 onClick={() => setSelectedTrajectory(traj.trajectory_number)}
-                                className="px-5 py-2.5 rounded-xl text-sm whitespace-nowrap transition-all duration-300"
+                                className="oracle-focusable oracle-trajectory-btn px-5 py-2.5 rounded-xl text-sm whitespace-nowrap"
                                 style={{
                                     background: selectedTrajectory === traj.trajectory_number
                                         ? '#D4AF37'
@@ -201,12 +314,15 @@ export default function OraclePage() {
                         ))}
                     </div>
 
-                    {/* Active Trajectory */}
+                    {/* Active Trajectory Panel */}
                     {trajectories.map((traj) => (
                         selectedTrajectory === traj.trajectory_number && (
                             <div
                                 key={traj.trajectory_number}
-                                className="rounded-2xl p-8 border border-white/[0.06] space-y-8"
+                                id={`trajectory-panel-${traj.trajectory_number}`}
+                                role="tabpanel"
+                                aria-labelledby={`trajectory-tab-${traj.trajectory_number}`}
+                                className="oracle-fadeIn rounded-2xl p-6 md:p-8 border border-white/[0.06] space-y-8"
                                 style={{ background: 'rgba(26,26,26,0.5)', backdropFilter: 'blur(12px)' }}
                             >
                                 {/* Tone Badge */}
@@ -239,42 +355,46 @@ export default function OraclePage() {
                                     <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/30 mb-4">Allocation focus suggérée</h3>
                                     <div className="space-y-3">
                                         {Object.entries(traj.focus_allocation).map(([project, percent]) => (
-                                            <div key={project} className="flex items-center gap-4">
-                                                <span className="text-white/50 text-sm min-w-[120px] capitalize">{project}</span>
+                                            <div key={project} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4">
+                                                <span className="text-white/50 text-sm sm:min-w-[120px] capitalize">{project}</span>
                                                 <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
                                                     <div
-                                                        className="h-full rounded-full transition-all duration-700"
+                                                        className="h-full rounded-full oracle-focus-bar"
                                                         style={{
                                                             width: `${percent}%`,
                                                             background: 'linear-gradient(90deg, #D4AF37, rgba(212,175,55,0.4))'
                                                         }}
                                                     />
                                                 </div>
-                                                <span className="text-white/30 text-xs min-w-[40px] text-right">{percent}%</span>
+                                                <span className="text-white/30 text-xs sm:min-w-[40px] sm:text-right">{percent}%</span>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
                                 {/* Timeline */}
-                                <div className="flex items-center gap-2 text-sm">
-                                    <Calendar className="w-4 h-4 text-[#D4AF37]/60" />
-                                    <span className="text-white/40">Timeline estimée :</span>
-                                    <span className="text-white/70">{traj.timeline_estimate}</span>
-                                </div>
+                                {traj.timeline_estimate && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <Calendar className="w-4 h-4 text-[#D4AF37]/60" />
+                                        <span className="text-white/40">Timeline estimée :</span>
+                                        <span className="text-white/70">{traj.timeline_estimate}</span>
+                                    </div>
+                                )}
 
                                 {/* Questions */}
-                                <div>
-                                    <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/30 mb-4">Questions pour toi</h3>
-                                    <ul className="space-y-2.5">
-                                        {traj.questions.map((q, idx) => (
-                                            <li key={idx} className="flex items-start gap-3 text-white/60 text-sm">
-                                                <span className="text-[#D4AF37]/60 mt-0.5">•</span>
-                                                <span className="leading-relaxed">{q}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                {traj.questions && traj.questions.length > 0 && (
+                                    <div>
+                                        <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/30 mb-4">Questions pour toi</h3>
+                                        <ul className="space-y-2.5">
+                                            {traj.questions.map((q, idx) => (
+                                                <li key={idx} className="flex items-start gap-3 text-white/60 text-sm">
+                                                    <span className="text-[#D4AF37]/60 mt-0.5">•</span>
+                                                    <span className="leading-relaxed">{q}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
 
                                 {/* Confidence */}
                                 {traj.confidence_note && (
@@ -288,25 +408,27 @@ export default function OraclePage() {
                 </section>
 
                 {/* ───────── Strategic Questions ───────── */}
-                <section>
+                <section className="oracle-fadeInUp oracle-delay-200" aria-labelledby="questions-heading">
                     <div className="flex items-center gap-3 mb-8">
                         <MessageCircle className="w-5 h-5 text-[#D4AF37]" />
-                        <h2 className="text-lg font-light text-white/90">Questions stratégiques</h2>
+                        <h2 id="questions-heading" className="text-lg font-light text-white/90">Questions stratégiques</h2>
                     </div>
 
                     <div className="space-y-3">
                         {questions.map((q, idx) => (
                             <div
                                 key={idx}
-                                className="rounded-xl overflow-hidden border border-white/[0.06] transition-all duration-300"
+                                className="oracle-question-card rounded-xl overflow-hidden border border-white/[0.06]"
                                 style={{ background: 'rgba(26,26,26,0.4)', backdropFilter: 'blur(8px)' }}
                             >
                                 <button
                                     onClick={() => setExpandedQuestion(expandedQuestion === idx ? null : idx)}
-                                    className="w-full px-6 py-5 text-left transition-colors duration-200"
+                                    className="oracle-focusable w-full px-4 md:px-6 py-5 text-left transition-colors duration-200"
                                     style={{ background: 'transparent' }}
                                     onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
                                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                                    aria-expanded={expandedQuestion === idx}
+                                    aria-controls={`question-detail-${idx}`}
                                 >
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex-1">
@@ -319,10 +441,10 @@ export default function OraclePage() {
                                             </span>
                                         </div>
                                         <div
-                                            className="transition-transform duration-300"
+                                            className="transition-transform duration-300 mt-1"
                                             style={{ transform: expandedQuestion === idx ? 'rotate(180deg)' : 'rotate(0deg)' }}
                                         >
-                                            <svg className="w-4 h-4 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </div>
@@ -330,7 +452,10 @@ export default function OraclePage() {
                                 </button>
 
                                 {expandedQuestion === idx && (
-                                    <div className="px-6 pb-5 space-y-3 border-t border-white/[0.04]">
+                                    <div
+                                        id={`question-detail-${idx}`}
+                                        className="oracle-fadeIn px-4 md:px-6 pb-5 space-y-3 border-t border-white/[0.04]"
+                                    >
                                         <div className="pt-4">
                                             <p className="text-[10px] uppercase tracking-[0.2em] text-white/30 mb-1">Contexte</p>
                                             <p className="text-sm text-white/60">{q.context}</p>
@@ -347,11 +472,11 @@ export default function OraclePage() {
                 </section>
 
                 {/* ───────── Footer ───────── */}
-                <div className="text-center pt-16 pb-8">
+                <footer className="text-center pt-16 pb-8" role="contentinfo">
                     <p className="text-[11px] tracking-[0.3em] text-white/20 uppercase">
                         Oracle • Clarté sans pression • Discipline sans jugement • Liberté intacte
                     </p>
-                </div>
+                </footer>
             </main>
         </div>
     );

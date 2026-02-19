@@ -10,6 +10,13 @@ interface WeeklySummary {
     fullSummaryMarkdown: string;
 }
 
+/**
+ * Generates a narrative weekly summary of all active projects.
+ * Categorizes projects into advancing, needs-attention, and stable.
+ * Produces calm, non-alarmist text suitable for CEO strategic review.
+ *
+ * @returns Complete summary with markdown export and section narratives
+ */
 export async function generateWeeklySummary(): Promise<WeeklySummary> {
     const supabase = getSupabaseClient();
 

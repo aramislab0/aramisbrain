@@ -1,4 +1,4 @@
-# 🧠 ARAMIS BRAIN v0.1
+# 🧠 ARAMIS BRAIN v0.2
 
 **Centre de Commandement Exécutif** pour Assane Aramis — Aramis Lab
 
@@ -42,6 +42,16 @@ Visualisation radar multi-dimensionnelle des risques actifs.
 ### 4. Dialogue IA Executive (`/ai-chat`)
 Assistant stratégique contextuel (GPT-4 / Claude Sonnet 4).
 
+### 5. ORACLE (`/oracle`) ✨ **NEW v0.2**
+Assistant stratégique calme — trajectoires, questions, résumé hebdomadaire.
+
+> *Clarté sans pression. Discipline sans jugement. Liberté intacte.*
+
+- **3 trajectoires** stratégiques hebdomadaires (concentration, équilibre, déblocage)
+- **Questions non-directives** contextualisées pour réflexion CEO
+- **Résumé narratif** hebdomadaire de tous les projets
+- Design Silent Command (noir + gold, aucun rouge/alerte)
+
 ---
 
 ## 🏗️ Architecture
@@ -61,15 +71,20 @@ Assistant stratégique contextuel (GPT-4 / Claude Sonnet 4).
 aramis-brain/
 ├── src/
 │   ├── app/
-│   │   ├── api/          # API Routes (4 endpoints)
+│   │   ├── api/          # API Routes (7 endpoints)
 │   │   ├── dashboard/    # Module 1: Cockpit
 │   │   ├── focus/        # Module 2: Focus du Jour
 │   │   ├── risks/        # Module 3: Radar Risques
-│   │   └── ai-chat/      # Module 4: Dialogue IA
+│   │   ├── ai-chat/      # Module 4: Dialogue IA
+│   │   └── oracle/       # Module 5: ORACLE v0.2
 │   ├── components/       # React Components
-│   └── lib/              # Utilities (Supabase, AI)
+│   └── lib/
+│       ├── oracle/       # Oracle logic (trajectories, questions, summary)
+│       └── supabase.ts   # Supabase client
 ├── supabase/
 │   └── migrations/       # SQL Schema + Seed Data
+├── docs/
+│   └── API.md            # API documentation
 └── scripts/
     ├── setup.sh          # Configuration wizard
     └── validate.sh       # Tests automatiques
@@ -116,6 +131,8 @@ npm run dev      # Serveur développement (localhost:3000)
 npm run build    # Build production
 npm run start    # Serveur production
 npm run lint     # ESLint
+npm test         # Unit tests (Vitest)
+npm run test:integration  # API integration tests
 ```
 
 ---
@@ -143,7 +160,7 @@ Voir [SETUP.md](./SETUP.md) section "Troubleshooting Rapide"
 
 **Assane Aramis** — CEO Aramis Lab  
 **Agent** : Claude (Antigravity IDE)  
-**Version** : v0.1 (Sprint Jour 4/10)
+**Version** : v0.2 (ORACLE)
 
 ---
 

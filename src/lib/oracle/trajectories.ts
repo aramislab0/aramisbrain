@@ -13,6 +13,17 @@ interface Trajectory {
     confidenceNote?: string;
 }
 
+/**
+ * Generates 3 strategic trajectories for the current week.
+ * Based on project health, momentum scores, and constraints from Supabase.
+ *
+ * Trajectories follow a calm, non-judgmental tone:
+ * 1. Concentration — focus on highest-momentum project
+ * 2. Équilibre — balance across all active projects
+ * 3. Déblocage/Opportunité — unblock a struggling project or accelerate high-ROI one
+ *
+ * @returns Array of exactly 3 trajectories with focus allocation, questions, and timeline
+ */
 export async function generateWeeklyTrajectories(): Promise<Trajectory[]> {
     const trajectories: Trajectory[] = [];
 

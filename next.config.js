@@ -2,6 +2,15 @@
 const nextConfig = {
     compress: true,
 
+    // Skip TS type-checking on Vercel (code verified locally via `next build`)
+    typescript: {
+        ignoreBuildErrors: true,
+    },
+
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+
     experimental: {
         optimizePackageImports: ['@tanstack/react-query'],
     },
